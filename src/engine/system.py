@@ -5,3 +5,6 @@ class System(object):
     
     def __init__(self, *args, **kwargs):
         pass
+
+    def update(self, dt):
+        raise NotImplementedError

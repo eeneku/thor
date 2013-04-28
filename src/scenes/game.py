@@ -4,6 +4,7 @@ from pyglet import image
 
 from engine import scene
 from engine import entity_manager
+from engine import system_manager
 
 from components import position
 from components import render
@@ -19,6 +20,7 @@ class Game(scene.Scene):
         super(Game, self).__init__(manager)
         
         self.entity_manager = entity_manager.EntityManager()
+        self.system_manager = system_manager.SystemManager()
         
         self.entity_1 = self.entity_manager.create_entity()
         self.entity_2 = self.entity_manager.create_entity()
@@ -42,10 +44,10 @@ class Game(scene.Scene):
         self.entity_manager.get_component(self.entity_2, render.Render).image = image.load("gfx/ship.png")
         
         self.render_system = render_system.RenderSystem(self.entity_manager)
-        self.movement_system = movement_system.MovementSystem(self.entity_manager)
+        self.system_manager.add_system(movement_system.MovementSystem(self.entity_manager))
     
     def update(self, dt):
-        self.movement_system.update(dt)
+        self.system_manager.update(dt)
             
     def on_draw(self):
         self.render_system.on_draw()

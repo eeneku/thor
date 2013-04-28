@@ -1,8 +1,4 @@
-'''
-Created on 27.4.2013
-
-@author: eeneku
-'''
+# -*- coding: utf-8 -*-
 
 class EntityManager(object):
     """ This class manages all entities in the game. """
@@ -14,32 +10,29 @@ class EntityManager(object):
         self.components = {}
         
     def get_component(self, entity, component):
-        store = self.components.get(component.__class__)
+        store = self.components.get(component.__name__)
+        
+        return_value = None
         
         if not store:
-            print("No entities with component " + component.__class__)
+            print("No entities with component " + component.__name__)
+        else:
+            result = store.get(entity)
         
-        result = store.get(entity)
+            if not result:
+                print("Entity " + entity + " does not posses component " + component.__name__)
+            else:
+                return_value = result
         
-        if not result:
-            print("Entity " + entity + " does not posses component " + component.__class__)
-        
-        return result
-    
-    def get_all_components_of_type(self, component):
-        store = self.components.get(component.__class__)
-        
-        return_value = []
-        
-        if store:
-            return_value = store.values()
-            
         return return_value
     
+    def get_all_components_of_type(self, component):
+        return self.components.get(component.__name__)
+    
     def get_all_entities_possessing_component(self, component):
-        store = self.components.get(component.__class__)
+        store = self.components.get(component.__name__)
         
-        return_value = {}
+        return_value = []
         
         if store:
             return_value = store.keys()
@@ -47,7 +40,7 @@ class EntityManager(object):
         return return_value
     
     def add_component(self, entity, component):
-        self.components.setdefault(component.__class__, {})[entity] = component()
+        self.components.setdefault(component.__name__, {})[entity] = component()
         
         return component
     

@@ -2,12 +2,12 @@
 
 from engine import component
 
-class Position(component.Component):
-    """ Position component."""
+class Velocity(component.Component):
+    """ Velocity component."""
 
     def __init__(self, *args, **kwargs):
         
-        super(Position, self).__init__(*kwargs, **kwargs)
+        super(Velocity, self).__init__(*kwargs, **kwargs)
         
         self.x = 0
         self.y = 0

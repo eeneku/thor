@@ -12,5 +12,5 @@ class PlayerInput(component.Component):
         self.move_left = None
         self.move_right = None
         self.move_up = None
-        self.move_left = None
+        self.move_down = None
         

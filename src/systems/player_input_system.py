@@ -23,7 +23,7 @@ class PlayerInputSystem(system.System):
             if store:
                 for entity, component in store.iteritems():
                     move = self.entity_manager.get_component(entity, movement.Movement)
-                    
+
                     if move:
                         if self.keys[component.move_up] and self.keys[component.move_left]:
                             move.rotation = 135

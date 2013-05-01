@@ -42,10 +42,10 @@ class Game(scene.Scene):
         self.entity_manager.get_component(self.entity_1, movement.Movement).y = 0
         self.entity_manager.get_component(self.entity_1, movement.Movement).speed = 128
         self.entity_manager.get_component(self.entity_1, render.Render).image = image.load("gfx/asteroid.png")
-        self.entity_manager.get_component(self.entity_1, player_input.PlayerInput).move_up = key.UP
-        self.entity_manager.get_component(self.entity_1, player_input.PlayerInput).move_down = key.DOWN
-        self.entity_manager.get_component(self.entity_1, player_input.PlayerInput).move_left = key.LEFT
-        self.entity_manager.get_component(self.entity_1, player_input.PlayerInput).move_right = key.RIGHT
+        self.entity_manager.get_component(self.entity_1, player_input.PlayerInput).move_up = 65362
+        self.entity_manager.get_component(self.entity_1, player_input.PlayerInput).move_down = 65364
+        self.entity_manager.get_component(self.entity_1, player_input.PlayerInput).move_left = 65361
+        self.entity_manager.get_component(self.entity_1, player_input.PlayerInput).move_right = 65363
         
         self.entity_manager.get_component(self.entity_2, position.Position).x = 500
         self.entity_manager.get_component(self.entity_2, position.Position).y = 95

@@ -11,3 +11,4 @@ class Position(component.Component):
         
         self.x = 0
         self.y = 0
+        

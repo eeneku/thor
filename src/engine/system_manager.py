@@ -15,3 +15,4 @@ class SystemManager(object):
             
     def remove_system(self, system):
         self.systems.remove(system)
+        

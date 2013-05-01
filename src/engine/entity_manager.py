@@ -20,7 +20,7 @@ class EntityManager(object):
             result = store.get(entity)
         
             if not result:
-                print("Entity " + entity + " does not posses component " + component.__name__)
+                print("Entity " + str(entity) + " does not posses component " + component.__name__)
             else:
                 return_value = result
         

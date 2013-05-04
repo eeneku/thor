@@ -12,7 +12,3 @@ class SystemManager(object):
     def update(self, dt):
         for system in self.systems:
             system.update(dt)
-            
-    def remove_system(self, system):
-        self.systems.remove(system)
-        

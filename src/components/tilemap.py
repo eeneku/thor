@@ -9,13 +9,12 @@ class Tilemap(component.Component):
         
         super(Tilemap, self).__init__(*kwargs, **kwargs)
         
-        self.tiles = []
+        self.layers = []
         
-        self.world_x = 0
-        self.world_y = 0
-        
-        self.x = 0
-        self.y = 0
+        self.tilewidth = 0
+        self.tileheight = 0
         
         self.width = 0
         self.height = 0
+        
+        self.version = ""

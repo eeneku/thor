@@ -12,12 +12,15 @@ from components import movement
 from components import player_input
 from components import tileset
 from components import tilemap
+from components import tilemap_render
 
 from systems import render_system
 from systems import movement_system
 from systems import player_input_system
 from systems import tilemap_system
-from systems import tilemap_render_system
+#from systems import tilemap_render_system
+
+from utils import tilemap_loader
 
 class Game(scene.Scene):
     """ The main scene where most of the game is happening. """
@@ -44,6 +47,7 @@ class Game(scene.Scene):
         
         self.entity_manager.add_component(self.entity_tilemap, tilemap.Tilemap)
         self.entity_manager.add_component(self.entity_tilemap, tileset.Tileset)
+        self.entity_manager.add_component(self.entity_tilemap, tilemap_render.TilemapRender)
         
         self.entity_manager.get_component(self.entity_1, position.Position).x = 99
         self.entity_manager.get_component(self.entity_1, position.Position).y = 150
@@ -78,20 +82,9 @@ class Game(scene.Scene):
         self.render_system.on_draw()
         
     def init_tilemap(self):
-        height = 20
-        width = 39
-        
-        self.entity_manager.get_component(self.entity_tilemap, tilemap.Tilemap).width = width
-        self.entity_manager.get_component(self.entity_tilemap, tilemap.Tilemap).height = height
-        self.entity_manager.get_component(self.entity_tilemap, tileset.Tileset).tiles.append(pyglet.image.load("gfx/grass.png"))
+        tilemap_loader.tilemap_loader("test2.tmx",
+                                      self.entity_manager.get_component(self.entity_tilemap, tilemap.Tilemap),
+                                      self.entity_manager.get_component(self.entity_tilemap, tileset.Tileset),
+                                      self.batch)
 
-        tset = self.entity_manager.get_component(self.entity_tilemap, tileset.Tileset).tiles[0].width
-       
-        for y in range(0, height):
-            for x in range(0, width):
-                new_tile = pyglet.sprite.Sprite(self.entity_manager.get_component(self.entity_tilemap, tileset.Tileset).tiles[0])
-                new_tile.x = x * tset
-                new_tile.y = y * tset
-                new_tile.batch = self.batch
-                self.entity_manager.get_component(self.entity_tilemap, tilemap.Tilemap).tiles.append(new_tile)
                 

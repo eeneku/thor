@@ -9,5 +9,6 @@ class Tileset(component.Component):
         
         super(Tileset, self).__init__(*kwargs, **kwargs)
         
-        self.tiles = {}
+        self.tiles = []
+        self.images = []
         

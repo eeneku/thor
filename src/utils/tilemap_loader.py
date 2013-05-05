@@ -7,6 +7,14 @@ import struct
 
 from xml.etree import ElementTree
 
+class Layer(object):
+    """ Layer holds one layer of tilemap. """
+    def __init__(self):
+        self.width = 0
+        self.height = 0
+        self.name = None
+        self.tiles = []
+
 def tilemap_loader(path, tilemap, tileset, batch):
     """ Parametres: tilemap component, tileset component, pyglet batch. """
     
@@ -18,7 +26,7 @@ def tilemap_loader(path, tilemap, tileset, batch):
     load_layers(root, tilemap, tileset, batch)
     
     print(tilemap.layers)
-    print(len(tilemap.layers[0]["tiles"]))
+    print(len(tilemap.layers[0].tiles))
 
 def load_map_properties(root, tilemap):
     tilemap.tileheight = int(root.get("tileheight"))
@@ -34,7 +42,6 @@ def load_tilesets(root, tileset):
     
     for element in elements:
         gid = int(element.get("firstgid"))
-        tileset.tiles[gid] = {}
         
         if element.get("source"):
             load_external_tileset(gid, element.get("source"), tileset)
@@ -48,14 +55,10 @@ def load_external_tileset(gid, path, tileset):
     add_new_tileset(gid, root, tileset)
 
 def add_new_tileset(gid, element, tileset):
-    tileset.tiles[gid]["tilewidth"] = int(element.get("tilewidth"))
-    tileset.tiles[gid]["tileheight"] = int(element.get("tileheight"))
     image = pyglet.image.load(element.find("image").get("source"))
-    tiles_w = image.width /  tileset.tiles[gid]["tilewidth"]
-    tiles_h = image.height /  tileset.tiles[gid]["tileheight"]
-    print(tiles_w, tiles_h)
-    tileset.tiles[gid]["image"] = pyglet.image.ImageGrid(image, tiles_h, tiles_w)
-    print(tileset.tiles[gid]["image"][0].width)
+    tiles_w = image.width /  int(element.get("tilewidth"))
+    tiles_h = image.height /  int(element.get("tilewidth"))
+    tileset.tiles.append((gid, (pyglet.image.TextureGrid(pyglet.image.ImageGrid(image, tiles_h, tiles_w)))))
     
 def load_layers(root, tilemap, tileset, batch):
     elements = root.findall("layer")
@@ -66,29 +69,34 @@ def load_layers(root, tilemap, tileset, batch):
 def add_new_layer(element, tilemap, tileset, batch):
     data = load_layer_data(element)
     
-    tilemap.layers.append({})
-    tilemap.layers[-1]["width"] = int(element.get("width"))
-    tilemap.layers[-1]["height"] = int(element.get("height"))
-    tilemap.layers[-1]["name"] = element.get("name")
-    tilemap.layers[-1]["tiles"] = []
+    tilemap.layers.append(Layer())
+    tilemap.layers[-1].width = int(element.get("width"))
+    tilemap.layers[-1].height = int(element.get("height"))
+    tilemap.layers[-1].name = element.get("name")
+    tilemap.layers[-1].tiles = {}
 
-    assert len(data) == tilemap.layers[-1]["width"] * tilemap.layers[-1]["height"]
+    assert len(data) == tilemap.layers[-1].width * tilemap.layers[-1].height
+    
+    print(data)
     
     i = 0
     
-    for y in range(0, tilemap.layers[-1]["height"]):
-        for x in range(0, tilemap.layers[-1]["width"]):
+    for y in range(0, tilemap.layers[-1].height):
+        for x in range(0, tilemap.layers[-1].width):
             if data[i] < 1: continue
             
             new_tile = pyglet.sprite.Sprite(get_tileset_image(tileset, data[i]))
         
             new_tile.x = x *  tilemap.tilewidth
-            new_tile.y = y *  tilemap.tileheight
+            ######## TODO MUUTA TÄÄ
+            new_tile.y = 688 + y *  -tilemap.tileheight
             new_tile.batch = batch
         
-            tilemap.layers[-1]["tiles"].append(new_tile)
+            tilemap.layers[-1].tiles[(x, y)] = new_tile
                 
             i = i + 1
+            
+    print(tilemap.layers[-1])
 
 def load_layer_data(layer):
     data_element = layer.find("data")
@@ -109,5 +117,16 @@ def decompress_layer_data(data):
     return zlib.decompress(data)
 
 def get_tileset_image(tileset, gid):
-    return tileset.tiles[2]["image"][45]
-    
+    tile = 0
+    for tset in reversed(tileset.tiles):
+        tile += 1
+        if gid >= tset[0]:
+            tile_id = gid - tset[0]
+            tiles_w = tset[1].columns
+            
+            y = tile_id / tiles_w
+            x = tile_id % tiles_w
+            y = tset[1].rows-1 - y
+            
+            return tset[1][y, x]
+        

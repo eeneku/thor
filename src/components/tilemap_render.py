@@ -11,11 +11,11 @@ class TilemapRender(component.Component):
         
         self.world_x = 0
         self.world_y = 0
+        self.need_to_update = True
         
         self.view_x = 0
-        self.view_y = 0
-        self.view_width = 500
-        self.view_height = 500
+        self.view_y = 720
+        self.view_width = 1280
+        self.view_height = 720
         
-        self.width = 0
-        self.height = 0
+        self.visible_tiles = set()

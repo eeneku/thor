@@ -15,8 +15,9 @@ class Layer(object):
         self.name = None
         self.tiles = []
 
+
 def tilemap_loader(path, tilemap, tileset, batch):
-    """ Parametres: tilemap component, tileset component, pyglet batch. """
+    """ Parametres: tilemap component, tileset component. """
     
     tree = ElementTree.parse(path)
     root = tree.getroot()
@@ -24,9 +25,6 @@ def tilemap_loader(path, tilemap, tileset, batch):
     load_map_properties(root, tilemap)
     load_tilesets(root, tileset)
     load_layers(root, tilemap, tileset, batch)
-    
-    print(tilemap.layers)
-    print(len(tilemap.layers[0].tiles))
 
 def load_map_properties(root, tilemap):
     tilemap.tileheight = int(root.get("tileheight"))
@@ -77,8 +75,6 @@ def add_new_layer(element, tilemap, tileset, batch):
 
     assert len(data) == tilemap.layers[-1].width * tilemap.layers[-1].height
     
-    print(data)
-    
     i = 0
     
     for y in range(0, tilemap.layers[-1].height):
@@ -86,17 +82,12 @@ def add_new_layer(element, tilemap, tileset, batch):
             if data[i] < 1: continue
             
             new_tile = pyglet.sprite.Sprite(get_tileset_image(tileset, data[i]))
-        
-            new_tile.x = x *  tilemap.tilewidth
-            ######## TODO MUUTA TÄÄ
-            new_tile.y = 688 + y *  -tilemap.tileheight
             new_tile.batch = batch
-        
+            new_tile.visible = False
+            
             tilemap.layers[-1].tiles[(x, y)] = new_tile
                 
             i = i + 1
-            
-    print(tilemap.layers[-1])
 
 def load_layer_data(layer):
     data_element = layer.find("data")

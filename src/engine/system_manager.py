@@ -9,6 +9,8 @@ class SystemManager(object):
     def add_system(self, system):
         self.systems.append(system)
         
+        return system
+        
     def update(self, dt):
         for system in self.systems:
             system.update(dt)

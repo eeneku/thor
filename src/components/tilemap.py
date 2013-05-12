@@ -10,6 +10,7 @@ class Tilemap(component.Component):
         super(Tilemap, self).__init__(*kwargs, **kwargs)
         
         self.layers = []
+        self.tileset_bin = None
         
         self.tilewidth = 0
         self.tileheight = 0
@@ -18,3 +19,4 @@ class Tilemap(component.Component):
         self.height = 0
         
         self.version = ""
+        

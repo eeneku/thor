@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import pyglet
 import math
 from engine import system
 
@@ -13,8 +14,16 @@ class TilemapRenderSystem(system.System):
         super(TilemapRenderSystem, self).__init__(*args, **kwargs)
         
         self.entity_manager = entity_manager
+        
+    def on_draw(self):
+        store = self.entity_manager.get_all_components_of_type(tilemap_render.TilemapRender)
+
+        if store:  
+            for entity, component in store.iteritems():      
+                component.batch.draw()
     
     def update(self, dt):
+        """ This method is supposed to narrow tiles to draw to the tiles visible on the screen. """
         store = self.entity_manager.get_all_components_of_type(tilemap.Tilemap)
 
         if store:
@@ -22,38 +31,43 @@ class TilemapRenderSystem(system.System):
                 trender = self.entity_manager.get_component(entity, tilemap_render.TilemapRender)
                 
                 if trender and trender.need_to_update:
+                    """ Lets calculate the tiles. """
                     tiles_to_draw = ((int(math.floor(trender.world_y/component.tileheight)), int((trender.world_y+trender.view_height)/component.tileheight + 2)),
-                                     (int(math.floor(trender.world_x/component.tilewidth)), int((trender.world_x+trender.view_width)/component.tilewidth + 2)))
-                    
-                    #print(math.floor(trender.world_y/component.tileheight), tiles_to_draw)
-                        
-                    view_y = trender.view_y - component.tileheight + trender.world_y % component.tileheight
-                    
-                    visible_tiles = []
-                
+                                     (int(math.floor(-trender.world_x/component.tilewidth)), int((-trender.world_x+trender.view_width)/component.tilewidth + 2)))
+
+                    vertex_data = []
+                    texture_data = []
+                    color_data = []
+                    vertices = 0
+
                     for y in range(tiles_to_draw[0][0], tiles_to_draw[0][1]):
-                        view_x = trender.view_x - trender.world_x % component.tilewidth
+                        # 720 is screen height!
+                        y1 = (720 - trender.view_y) + component.tileheight * -y
+                        y2 = y1 - component.tileheight
                         
                         for x in range(tiles_to_draw[1][0], tiles_to_draw[1][1]):
+                            x1 = trender.view_x + component.tilewidth * x
+                            x2 = x1 + component.tilewidth
+                
+                            
                             for layer in reversed(component.layers):
                                 if (x,y) in layer.tiles:
-                                    layer.tiles[(x,y)].visible = True
-
-                                    visible_tiles.append(layer.tiles[(x,y)])
-
-
-                                view_x = view_x + component.tilewidth
-                                
-                        view_y = view_y - component.tileheight
-                        
-                    new_visible_set = set(visible_tiles)
-
-                    sprites_over_view = trender.visible_tiles.difference(new_visible_set)
-                    trender.visible_tiles = new_visible_set
-  
-                    for sprite in sprites_over_view:
-                        sprite.visible = False
-                        sprite.batch = None
-                        
+                                    
+                                    vertex_data.extend([x1, y2, x2, y2, x2, y1, x1, y1])
+                                    texture_data.extend(component.tileset_bin.tiles[layer.tiles[(x,y)].gid].tex_coords)
+                                    color_data.extend((255, 255, 255, 255)*4)
+                   
+                                    vertices = vertices + 1
+    
+                    trender.batch = pyglet.graphics.Batch()
+                    trender.batch.add(vertices*4, 
+                                      pyglet.gl.GL_QUADS, 
+                                      pyglet.graphics.TextureGroup(component.tileset_bin.atlas.texture),
+                                      ('v2i', vertex_data),
+                                      ('t3f', texture_data),
+                                      ('c4B', color_data))
+                    
                     trender.need_to_update = False
+
+
                     

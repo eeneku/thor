@@ -14,8 +14,9 @@ class TilemapRender(component.Component):
         self.need_to_update = True
         
         self.view_x = 0
-        self.view_y = 720
+        self.view_y = 0
         self.view_width = 1280
         self.view_height = 720
         
+        self.batch = None
         self.visible_tiles = set()

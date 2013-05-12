@@ -2,6 +2,7 @@
 
 import pyglet
 
+from pyglet import gl
 from pyglet.window import key
 
 from engine import scene
@@ -97,33 +98,44 @@ class Game(scene.Scene):
         self.init_tilemap()
  
         self.render_system = render_system.RenderSystem(self.entity_manager)
-        self.system_manager.add_system(tilemap_render_system.TilemapRenderSystem(self.entity_manager))
+        self.tilemap_render_system = self.system_manager.add_system(tilemap_render_system.TilemapRenderSystem(self.entity_manager))
         self.system_manager.add_system(movement_system.MovementSystem(self.entity_manager))
         self.system_manager.add_system(player_input_system.PlayerInputSystem(self.entity_manager, self.manager.engine.key_state))
         self.system_manager.add_system(tilemap_system.TilemapSystem(self.entity_manager))
     
     def update(self, dt):
-        if self.manager.engine.key_state[key.UP]:
-            self.entity_manager.get_component(self.entity_tilemap, tilemap_render.TilemapRender).world_y -= 128 * dt
-        if self.manager.engine.key_state[key.DOWN]:
-            self.entity_manager.get_component(self.entity_tilemap, tilemap_render.TilemapRender).world_y += 128 * dt
-        if self.manager.engine.key_state[key.RIGHT]:
-            self.entity_manager.get_component(self.entity_tilemap, tilemap_render.TilemapRender).world_x -= 128 * dt
-        if self.manager.engine.key_state[key.LEFT]:
-            self.entity_manager.get_component(self.entity_tilemap, tilemap_render.TilemapRender).world_x += 128 * dt
-            
-        self.entity_manager.get_component(self.entity_tilemap, tilemap_render.TilemapRender).need_to_update = True
+        self.move_tilemap(dt)
         self.system_manager.update(dt)
             
     def on_draw(self):
+        gl.glLoadIdentity()
+        gl.glTranslatef(self.entity_manager.get_component(self.entity_tilemap, tilemap_render.TilemapRender).world_x,
+                        self.entity_manager.get_component(self.entity_tilemap, tilemap_render.TilemapRender).world_y,
+                        0)
+        gl.glPushMatrix()
         self.batch.draw()
         self.render_system.on_draw()
-
+        gl.glPopMatrix()
+        self.tilemap_render_system.on_draw()
+        gl.glLoadIdentity()
         
     def init_tilemap(self):
-        tilemap_loader.tilemap_loader("test2.tmx",
-                                      self.entity_manager.get_component(self.entity_tilemap, tilemap.Tilemap),
-                                      self.entity_manager.get_component(self.entity_tilemap, tileset.Tileset),
-                                      self.batch)
+        tilemap_loader.tilemap_loader("test.tmx",
+                                      self.entity_manager.get_component(self.entity_tilemap, tilemap.Tilemap))
+               
+    def move_tilemap(self, dt):
+        if self.manager.engine.key_state[key.UP]:
+            self.entity_manager.get_component(self.entity_tilemap, tilemap_render.TilemapRender).world_y -= 128 * dt
+            self.entity_manager.get_component(self.entity_tilemap, tilemap_render.TilemapRender).need_to_update = True
+        if self.manager.engine.key_state[key.DOWN]:
+            self.entity_manager.get_component(self.entity_tilemap, tilemap_render.TilemapRender).world_y += 128 * dt
+            self.entity_manager.get_component(self.entity_tilemap, tilemap_render.TilemapRender).need_to_update = True
+        if self.manager.engine.key_state[key.RIGHT]:
+            self.entity_manager.get_component(self.entity_tilemap, tilemap_render.TilemapRender).world_x -= 128 * dt
+            self.entity_manager.get_component(self.entity_tilemap, tilemap_render.TilemapRender).need_to_update = True
+        if self.manager.engine.key_state[key.LEFT]:
+            self.entity_manager.get_component(self.entity_tilemap, tilemap_render.TilemapRender).world_x += 128 * dt
+            self.entity_manager.get_component(self.entity_tilemap, tilemap_render.TilemapRender).need_to_update = True
+         
 
                 
